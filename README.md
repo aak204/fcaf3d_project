@@ -106,6 +106,7 @@ python gradio/gradio_interface.py
 *   **Средний Macro F1 (Presence):** 0.9775
 
 ![Пример работы интерфейса Gradio](images/gradio.png)
+
 *Рисунок 2 – Демонстрация работы системы через интерфейс Gradio.*
 
 ---
