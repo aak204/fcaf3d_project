@@ -394,10 +394,8 @@ def check_fcaf3d_portal_intersection(
         if iou_with_portal > iou_threshold:
             is_portal_intersected = True
             num_intersecting_objects += 1
-            details = f"Объект FCAF3D (IoU с порталом: {iou_with_portal:.2f})"
-            intersecting_objects_details.append(details)
-            print(f"Обнаружено пересечение FCAF3D объекта с порталом: {details}")
-    return is_portal_intersected, num_intersecting_objects, intersecting_objects_details
+            print(f"Обнаружено пересечение FCAF3D объекта с порталом")
+    return is_portal_intersected, num_intersecting_objects
 
 
 # --- Визуализация Plotly ---
@@ -669,15 +667,12 @@ def analyze_safety(image_pil: Image.Image, pcd_file_obj):
         # 5. Логика определения опасности
         is_overall_dangerous = False
         num_intersecting_fcaf3d_objects = 0
-        intersecting_details_text = "Нет пересекающихся объектов FCAF3D."
 
-        is_portal_intersected_by_fcaf3d, num_intersecting, intersecting_details = \
+        is_portal_intersected_by_fcaf3d, num_intersecting = \
             check_fcaf3d_portal_intersection(
                 pred_bboxes_norm_fcaf3d, portal_bbox_norm, iou_threshold=0.05
             )
         num_intersecting_fcaf3d_objects = num_intersecting
-        if intersecting_details:
-            intersecting_details_text = ", ".join(intersecting_details)
 
         if door_state_internal in ["CLOSED", "SEMI"]:
             if is_portal_intersected_by_fcaf3d:
@@ -758,19 +753,16 @@ def analyze_safety(image_pil: Image.Image, pcd_file_obj):
                 f"Дверь \"{door_state_display}\". "
                 f"В зоне портала обнаружен(ы) объект(ы) FCAF3D "
                 f"({num_intersecting_fcaf3d_objects} шт.). "
-                f"Детали: {intersecting_details_text}."
             )
         elif door_state_internal in ["UNKNOWN", "OPEN"]:
             final_assessment_text = (
                 f"Дверь \"{door_state_display}\". Ситуация считается безопасной. "
                 f"(Объектов FCAF3D в/у портала: {num_intersecting_fcaf3d_objects}. "
-                f"Детали: {intersecting_details_text})"
             )
         else:
             final_assessment_text = (
                 f"Опасность не обнаружена. Дверь \"{door_state_display}\". "
                 f"(Объектов FCAF3D в/у портала: {num_intersecting_fcaf3d_objects}. "
-                f"Детали: {intersecting_details_text})"
             )
 
         result_html = f"""
@@ -791,7 +783,7 @@ def analyze_safety(image_pil: Image.Image, pcd_file_obj):
                         Анализ облака точек (3D, норм. коорд.)
                     </h3>
                     <p style="font-size:1.0em;"><b>Объектов FCAF3D в/у портала:</b> {num_intersecting_fcaf3d_objects}</p>
-                    <p style="font-size:1.0em;"><b>Детали пересечений FCAF3D:</b> {intersecting_details_text}</p>
+                    <p style="font-size:1.0em;"><b>Детали пересечений FCAF3D:</b></p>
                     <img src="{matplotlib_img_base64_src}" alt="3D визуализация облака точек" style="max-width:100%; height:auto; border-radius:5px; border: 1px solid #ddd; margin-top:10px;">
                     {plotly_status_message}
                 </div>
@@ -839,13 +831,13 @@ def analyze_safety(image_pil: Image.Image, pcd_file_obj):
 def create_gradio_interface():
     """Создает и настраивает интерфейс Gradio."""
     with gr.Blocks(
-            title="Система Анализа Безопасности Двери",
+            title="Система анализа безопасности двери",
             theme=gr.themes.Soft(
                 primary_hue="blue", secondary_hue="sky", neutral_hue="slate"
             )
     ) as interface:
         gr.Markdown(
-            "<h1 style='text-align:center; color:#2c3e50;'>Система Анализа Безопасности Двери</h1>"
+            "<h1 style='text-align:center; color:#2c3e50;'>Система анализа безопасности двери</h1>"
         )
         gr.Markdown(
             "<p style='text-align:center; color:#555; font-size:1.1em;'>"
